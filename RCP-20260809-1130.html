@@ -1,0 +1,389 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Moon Network — E-Receipt</title>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800;900&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css">
+    <style>
+        :root {
+            --primary:      #c82de3;
+            --primary-glow: rgba(200, 45, 227, 0.15);
+            --primary-dim:  rgba(200, 45, 227, 0.06);
+            --bg-deep:      #080808;
+            --card-bg:      rgba(14, 14, 14, 0.95);
+            --border:       rgba(255, 255, 255, 0.07);
+            --border-glow:  rgba(200, 45, 227, 0.3);
+            --text-main:    #f4f4f5;
+            --text-muted:   #71717a;
+            --text-soft:    #a1a1aa;
+            --green:        #22c55e;
+            --green-dim:    rgba(34, 197, 94, 0.1);
+            --green-border: rgba(34, 197, 94, 0.25);
+        }
+
+        * { margin: 0; padding: 0; box-sizing: border-box; }
+
+        body {
+            font-family: 'Inter', sans-serif;
+            background: var(--bg-deep);
+            color: var(--text-main);
+            min-height: 100vh;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            padding: 48px 20px;
+            -webkit-font-smoothing: antialiased;
+        }
+
+        body::before {
+            content: '';
+            position: fixed;
+            top: -300px; left: 50%;
+            transform: translateX(-50%);
+            width: 800px; height: 600px;
+            background: radial-gradient(ellipse, rgba(200,45,227,0.05) 0%, transparent 70%);
+            pointer-events: none;
+            z-index: 0;
+        }
+
+        /* ── Card ─────────────────────────────────────────────────────────── */
+        .receipt {
+            position: relative;
+            z-index: 1;
+            width: 100%;
+            max-width: 520px;
+            background: var(--card-bg);
+            border: 1px solid var(--border);
+            border-radius: 24px;
+            overflow: hidden;
+        }
+
+        /* ── Header ───────────────────────────────────────────────────────── */
+        .header {
+            padding: 30px 32px 26px;
+            border-bottom: 1px solid var(--border);
+            display: flex;
+            align-items: flex-start;
+            justify-content: space-between;
+        }
+
+        .brand-name {
+            font-size: 1.35rem;
+            font-weight: 900;
+            letter-spacing: -0.04em;
+            background: linear-gradient(135deg, #fff 40%, var(--primary));
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            line-height: 1;
+        }
+
+        .brand-label {
+            margin-top: 5px;
+            font-size: 0.65rem;
+            font-weight: 700;
+            color: var(--text-muted);
+            letter-spacing: 2.5px;
+            text-transform: uppercase;
+        }
+
+        .approved {
+            display: flex;
+            align-items: center;
+            gap: 6px;
+            background: var(--green-dim);
+            border: 1px solid var(--green-border);
+            border-radius: 100px;
+            padding: 5px 14px;
+            font-size: 0.68rem;
+            font-weight: 800;
+            color: var(--green);
+            letter-spacing: 2px;
+            text-transform: uppercase;
+        }
+
+        .dot {
+            width: 5px; height: 5px;
+            border-radius: 50%;
+            background: var(--green);
+        }
+
+        /* ── Sections ─────────────────────────────────────────────────────── */
+        .section {
+            padding: 24px 32px;
+            border-bottom: 1px solid var(--border);
+        }
+
+        .section:last-child { border-bottom: none; }
+
+        .section-title {
+            font-size: 0.62rem;
+            font-weight: 800;
+            color: var(--primary);
+            letter-spacing: 3px;
+            text-transform: uppercase;
+            margin-bottom: 18px;
+        }
+
+        /* ── Rows ─────────────────────────────────────────────────────────── */
+        .row {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding: 7px 0;
+        }
+
+        .row + .row {
+            border-top: 1px solid rgba(255,255,255,0.03);
+        }
+
+        .row-key {
+            font-size: 0.75rem;
+            font-weight: 500;
+            color: var(--text-muted);
+        }
+
+        .row-val {
+            font-size: 0.78rem;
+            font-weight: 600;
+            color: var(--text-soft);
+            text-align: right;
+            max-width: 65%;
+            word-break: break-all;
+        }
+
+        .row-val.accent { color: var(--primary); font-weight: 700; }
+        .row-val.white  { color: var(--text-main); }
+
+        .row-val.mono {
+            font-family: 'Courier New', monospace;
+            font-size: 0.7rem;
+            letter-spacing: 0.02em;
+            color: var(--text-soft);
+        }
+
+        /* role pill */
+        .pill {
+            display: inline-block;
+            background: var(--primary-dim);
+            border: 1px solid rgba(200,45,227,0.2);
+            border-radius: 100px;
+            padding: 2px 12px;
+            font-size: 0.7rem;
+            font-weight: 700;
+            color: var(--primary);
+            letter-spacing: 0.5px;
+        }
+
+        /* ── Note ─────────────────────────────────────────────────────────── */
+        .note {
+            font-size: 0.73rem;
+            color: var(--text-muted);
+            line-height: 1.65;
+        }
+
+        .note a {
+            color: var(--primary);
+            text-decoration: none;
+            font-weight: 600;
+        }
+
+        /* ── Signature ────────────────────────────────────────────────────── */
+        .sig-row {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+        }
+
+        .sig-left { display: flex; flex-direction: column; gap: 3px; }
+
+        .sig-name {
+            font-size: 0.85rem;
+            font-weight: 700;
+            color: var(--text-main);
+        }
+
+        .sig-role {
+            font-size: 0.68rem;
+            color: var(--text-muted);
+            font-weight: 500;
+        }
+
+        .sig-right {
+            display: flex;
+            flex-direction: column;
+            align-items: flex-end;
+            gap: 2px;
+        }
+
+        .sig-verified {
+            font-size: 0.62rem;
+            font-weight: 800;
+            letter-spacing: 2px;
+            text-transform: uppercase;
+            color: var(--green);
+        }
+
+        .sig-signed {
+            font-size: 0.62rem;
+            font-weight: 700;
+            letter-spacing: 1.5px;
+            text-transform: uppercase;
+            color: var(--text-muted);
+        }
+
+        /* ── Footer ───────────────────────────────────────────────────────── */
+        .footer {
+            padding: 14px 32px;
+            background: rgba(255,255,255,0.015);
+            border-top: 1px solid var(--border);
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+        }
+
+        .footer-brand {
+            font-size: 0.68rem;
+            font-weight: 700;
+            color: rgba(255,255,255,0.2);
+            letter-spacing: 1px;
+            text-transform: uppercase;
+        }
+
+        .footer-id {
+            font-size: 0.63rem;
+            font-family: 'Courier New', monospace;
+            color: rgba(255,255,255,0.15);
+            letter-spacing: 1px;
+        }
+
+        @media (max-width: 480px) {
+            .header, .section { padding-left: 22px; padding-right: 22px; }
+            .footer { padding-left: 22px; padding-right: 22px; }
+        }
+    </style>
+</head>
+<body>
+
+<div class="receipt">
+
+    <!-- Header -->
+    <div class="header">
+        <div>
+            <div class="brand-name">Moon Network</div>
+            <div class="brand-label">E-Receipt</div>
+        </div>
+        <div class="approved">
+            <div class="dot"></div>
+            Approved
+        </div>
+    </div>
+
+    <!-- Purchase Details -->
+    <div class="section">
+        <div class="section-title">Purchase Details</div>
+        <div class="row">
+            <div class="row-key">Purchaser</div>
+            <div class="row-val accent">s******x</div>
+        </div>
+        <div class="row">
+            <div class="row-key">Date</div>
+            <div class="row-val white">09 August 2026</div>
+        </div>
+        <div class="row">
+            <div class="row-key">Time</div>
+            <div class="row-val">11:30 GMT+3</div>
+        </div>
+        <div class="row">
+            <div class="row-key">Refund Expiry</div>
+            <div class="row-val">12:30 GMT+3</div>
+        </div>
+    </div>
+
+    <!-- Service Details -->
+    <div class="section">
+        <div class="section-title">Service Details</div>
+        <div class="row">
+            <div class="row-key">Username</div>
+            <div class="row-val accent">s*******x</div>
+        </div>
+        <div class="row">
+            <div class="row-key">Addon</div>
+            <div class="row-val">+1 API</div>
+        </div>
+    </div>
+
+    <!-- Payment Details -->
+    <div class="section">
+        <div class="section-title">Payment Details</div>
+        <div class="row">
+            <div class="row-key">Method</div>
+            <div class="row-val white">Cyptro &nbsp;·&nbsp; USDT &nbsp;·&nbsp; BNB Network</div>
+        </div>
+        <div class="row">
+            <div class="row-key">Sender</div>
+            <div class="row-val mono">0x3b2fCFEf1840fA74E875fF0ab6dfC9151F658537</div>
+        </div>
+        <div class="row">
+            <div class="row-key">Receiver</div>
+            <div class="row-val mono">0xBC34B5708c998E77536F7f475ccc204716496648</div>
+        </div>
+        <div class="row">
+            <div class="row-key">Transaction ID</div>
+            <div class="row-val mono">0x677cd5991b57e3cbde2afe6837c57907f488f4d5ed4c08f50e256e1843173c03</div>
+        </div>
+        <div class="row">
+            <div class="row-key">Date</div>
+            <div class="row-val">08/08/2026 &nbsp;·&nbsp; 10:11</div>
+        </div>
+        <div class="row">
+            <div class="row-key">Volume</div>
+            <div class="row-val white">25 USDT &nbsp;<span style="color:var(--text-muted);font-weight:500;">($25.00)</span></div>
+        </div>
+    </div>
+
+    <!-- Seller -->
+    <div class="section">
+        <div class="section-title">Seller</div>
+        <div class="row">
+            <div class="row-key">Contact</div>
+            <div class="row-val">@mwbush &nbsp;·&nbsp; Mart</div>
+        </div>
+    </div>
+
+    <!-- Description -->
+    <div class="section">
+        <div class="section-title">Description</div>
+        <div class="note">
+            If you face any issues please let us know. —
+            <a href="/cdn-cgi/l/email-protection#a9cac6c7ddc8cadde9c4c6c6c7c7ccdddec6dbc287c6c7c5c0c7cc"><span class="__cf_email__" data-cfemail="f695999882979582b69b9999989893828199849dd899989a9f9893">[email&#160;protected]</span></a>
+            or <a href="https://t.me/moonc2netz">t.me/moonc2netz</a>
+        </div>
+    </div>
+
+    <!-- Signature -->
+    <div class="section">
+        <div class="section-title">Seller Signature</div>
+        <div class="sig-row">
+            <div class="sig-left">
+                <div class="sig-name">Mart</div>
+                <div class="sig-role">Moon Network &nbsp;·&nbsp; Authorized Seller</div>
+            </div>
+            <div class="sig-right">
+                <div class="sig-verified">Verified</div>
+                <div class="sig-signed">Signed</div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Footer -->
+    <div class="footer">
+        <div class="footer-brand">Moon Network</div>
+        <div class="footer-id">RCP-20260809-1130</div>
+    </div>
+
+</div>
+
+<script data-cfasync="false" src="/cdn-cgi/scripts/5c5dd728/cloudflare-static/email-decode.min.js"></script></body>
+</html>
